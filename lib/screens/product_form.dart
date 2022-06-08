@@ -1,8 +1,13 @@
+// import 'dart:html';
+import 'dart:io' as io;
+
 import 'package:batoflutter/constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:image_picker/image_picker.dart';
+// import 'dart:io' as io;
 
 class ProductForm extends StatefulWidget {
   const ProductForm({Key? key}) : super(key: key);
@@ -15,6 +20,17 @@ class _ProductFormState extends State<ProductForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _textControllerBody = TextEditingController();
   bool _loading = false;
+  io.File? _imageFile;
+  final _picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await _picker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = io.File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +47,12 @@ class _ProductFormState extends State<ProductForm> {
                 Container(
                   width: MediaQuery.of(context).size.width,
                   height: 200,
+                  decoration: BoxDecoration(
+                    image: _imageFile == null ? null : DecorationImage(
+                      image: FileImage(_imageFile! ?? io.File('')),
+                      fit: BoxFit.cover
+                    )
+                  ),
                   child: Center(
                     child: IconButton(
                       icon: Icon(
@@ -38,7 +60,9 @@ class _ProductFormState extends State<ProductForm> {
                         size: 50,
                         color: Colors.black38,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        getImage();
+                      },
                     ),
                   ),
                 ),
@@ -64,10 +88,10 @@ class _ProductFormState extends State<ProductForm> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
                   child: kTextButton('Add', () {
-                    if (_formKey.currentState!.validate()){
+                    if (_formKey.currentState!.validate()) {
                       setState(() {
-                      _loading = !_loading;
-                    });
+                        _loading = !_loading;
+                      });
                     }
                   }),
                 )

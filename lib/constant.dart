@@ -1,18 +1,18 @@
 // ------STRINGS-----
 import 'package:flutter/material.dart';
 
-const baseURL = 'http://127.0.0.1:8000/api';
-const loginURL = '$baseURL/login';
-const registerURL = '$baseURL/register';
-const logoutURL = '$baseURL/logout';
-const userURL = '$baseURL/user';
-const productsURL = '$baseURL/products';
-const commentsURL = '$baseURL/comments';
+const baseURL = 'http://192.168.1.154:8000/api';
+const loginURL = baseURL + '/login';
+const registerURL = baseURL + '/register';
+const logoutURL = baseURL + '/logout';
+const userURL = baseURL + '/user';
+const postsURL = baseURL + '/posts';
+const commentsURL = baseURL + '/comments';
 
-// -----ERRORS-----
+// ----- Errors -----
 const serverError = 'Server error';
 const unauthorized = 'Unauthorized';
-const somethingWentWrong = 'Something went wrong, try again';
+const somethingWentWrong = 'Something went wrong, try again!';
 
 
 // ----- INPUT DECORATIONS -----

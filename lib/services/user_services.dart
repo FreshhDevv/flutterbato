@@ -43,7 +43,7 @@ Future<ApiResponse> register(String name, String email, String password) async {
   try {
     final response = await http.post(Uri.parse(registerURL),
         headers: {'Accept': 'application/json'},
-        body: {'name': name, 'email': email, 'password': password});
+        body: {'name': name, 'email': email, 'password': password, 'password_confirmation':password});
 
     switch (response.statusCode) {
       case 200:
@@ -77,16 +77,12 @@ Future<ApiResponse> getUserDetail() async {
       'Authorization': 'Bearer $token'
     });
 
-    switch (response.statusCode) {
+    switch(response.statusCode){
       case 200:
         apiResponse.data = User.fromJson(jsonDecode(response.body));
         break;
-      case 422:
-        final errors = jsonDecode(response.body)['errors'];
-        apiResponse.error = errors[errors.keys.elementAt(0)][0];
-        break;
-      case 403:
-        apiResponse.error = jsonDecode(response.body)['message'];
+      case 401:
+        apiResponse.error = unauthorized;
         break;
       default:
         apiResponse.error = somethingWentWrong;
