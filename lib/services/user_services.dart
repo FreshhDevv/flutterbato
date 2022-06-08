@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:batoflutter/constant.dart';
 import 'package:batoflutter/models/api_response.dart';
@@ -112,3 +113,9 @@ Future<bool> logout() async {
   SharedPreferences pref = await SharedPreferences.getInstance();
   return await pref.remove('token');
 } 
+
+// Get base64 encoded image
+String? getStringImage(File? file) {
+  if (file == null) return null ;
+  return base64Encode(file.readAsBytesSync());
+}

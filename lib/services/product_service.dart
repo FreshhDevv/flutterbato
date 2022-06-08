@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 
 import '../constant.dart';
 import '../models/api_response.dart';
-
 // Get all products
 Future<ApiResponse> getProducts() async {
   ApiResponse apiResponse = ApiResponse();
@@ -19,7 +18,7 @@ Future<ApiResponse> getProducts() async {
 
     switch (response.statusCode) {
       case 200:
-        apiResponse.data = jsonDecode(response.body)['products']
+        apiResponse.data = jsonDecode(response.body)['posts']
             .map((p) => Product.fromJson(p))
             .toList();
         // we get list of products, so we need to map each item to product model
@@ -37,7 +36,6 @@ Future<ApiResponse> getProducts() async {
   }
   return apiResponse;
 }
-
 // Create post
 Future<ApiResponse> createProduct(String body, String? image) async {
   ApiResponse apiResponse = ApiResponse();
@@ -53,11 +51,9 @@ Future<ApiResponse> createProduct(String body, String? image) async {
     } : {
       'body': body
     });
-
     // here if the image is null we just send the body, if not null we send the image too
-
     switch(response.statusCode){
-      case 200:
+      case 201:
         apiResponse.data = jsonDecode(response.body);
         break;
       case 422:
@@ -84,7 +80,7 @@ Future<ApiResponse> editProduct(int postId, String body) async {
   ApiResponse apiResponse = ApiResponse();
   try {
     String token = await getToken();
-    final response = await http.put(Uri.parse('$postsURL/$postId'),
+    final response = await http.post(Uri.parse('$postsURL/$postId'),
     headers: {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token'

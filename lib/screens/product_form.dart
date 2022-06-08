@@ -2,11 +2,16 @@
 import 'dart:io' as io;
 
 import 'package:batoflutter/constant.dart';
+import 'package:batoflutter/models/api_response.dart';
+import 'package:batoflutter/services/product_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../services/user_services.dart';
+import 'login.dart';
 // import 'dart:io' as io;
 
 class ProductForm extends StatefulWidget {
@@ -32,6 +37,27 @@ class _ProductFormState extends State<ProductForm> {
     }
   }
 
+  void _createProduct() async {
+    String? image = _imageFile == null ? null : getStringImage(_imageFile);
+    ApiResponse response = await createProduct(_textControllerBody.text, image);
+
+    if (response.error == null) {
+      Navigator.of(context).pop();
+    } else if (response.error == unauthorized) {
+      logout().then((value) => {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => Login()),
+                (route) => false)
+          });
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${response.error}')));
+      setState(() {
+        _loading = !_loading;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,11 +74,11 @@ class _ProductFormState extends State<ProductForm> {
                   width: MediaQuery.of(context).size.width,
                   height: 200,
                   decoration: BoxDecoration(
-                    image: _imageFile == null ? null : DecorationImage(
-                      image: FileImage(_imageFile! ?? io.File('')),
-                      fit: BoxFit.cover
-                    )
-                  ),
+                      image: _imageFile == null
+                          ? null
+                          : DecorationImage(
+                              image: FileImage(_imageFile! ?? io.File('')),
+                              fit: BoxFit.cover)),
                   child: Center(
                     child: IconButton(
                       icon: Icon(
@@ -92,6 +118,7 @@ class _ProductFormState extends State<ProductForm> {
                       setState(() {
                         _loading = !_loading;
                       });
+                      _createProduct();
                     }
                   }),
                 )
