@@ -18,7 +18,7 @@ Future<ApiResponse> getProducts() async {
 
     switch (response.statusCode) {
       case 200:
-        apiResponse.data = jsonDecode(response.body)['posts']
+        apiResponse.data = jsonDecode(response.body)['products']
             .map((p) => Product.fromJson(p))
             .toList();
         // we get list of products, so we need to map each item to product model
