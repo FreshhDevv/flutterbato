@@ -2,6 +2,7 @@ import 'package:batoflutter/constant.dart';
 import 'package:batoflutter/models/api_response.dart';
 import 'package:batoflutter/models/product.dart';
 import 'package:batoflutter/screens/login.dart';
+import 'package:batoflutter/screens/product_form.dart';
 import 'package:batoflutter/services/product_service.dart';
 import 'package:batoflutter/services/user_services.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,6 +32,22 @@ class _ProductScreenState extends State<ProductScreen> {
         _postList = response.data as List<dynamic>;
         _loading = _loading ? !_loading : _loading;
       });
+    } else if (response.error == unauthorized) {
+      logout().then((value) => {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => Login()),
+                (route) => false)
+          });
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${response.error}')));
+    }
+  }
+
+  void _handleDeletePost(int postId) async {
+    ApiResponse response = await deleteProduct(postId);
+    if (response.error == null) {
+      retrieveProducts();
     } else if (response.error == unauthorized) {
       logout().then((value) => {
             Navigator.of(context).pushAndRemoveUntil(
@@ -136,9 +153,16 @@ class _ProductScreenState extends State<ProductScreen> {
                                         ],
                                     onSelected: (val) {
                                       if (val == 'edit') {
-                                        //edit
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProductForm(
+                                                      title: 'Edit Product',
+                                                      post: post,
+                                                    )));
+                                                    
                                       } else {
-                                        //delete
+                                        _handleDeletePost(post.id ?? 0);
                                       }
                                     })
                                 : SizedBox()

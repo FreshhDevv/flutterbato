@@ -80,7 +80,7 @@ Future<ApiResponse> editProduct(int postId, String body) async {
   ApiResponse apiResponse = ApiResponse();
   try {
     String token = await getToken();
-    final response = await http.post(Uri.parse('$postsURL/$postId'),
+    final response = await http.put(Uri.parse('$postsURL/$postId'),
     headers: {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token'

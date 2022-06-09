@@ -3,6 +3,7 @@ import 'dart:io' as io;
 
 import 'package:batoflutter/constant.dart';
 import 'package:batoflutter/models/api_response.dart';
+import 'package:batoflutter/models/product.dart';
 import 'package:batoflutter/services/product_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,12 @@ import 'login.dart';
 // import 'dart:io' as io;
 
 class ProductForm extends StatefulWidget {
-  const ProductForm({Key? key}) : super(key: key);
+  final Product? post;
+  final String? title;
+
+  ProductForm({this.post, this.title});
+
+  
 
   @override
   State<ProductForm> createState() => _ProductFormState();
@@ -58,11 +64,40 @@ class _ProductFormState extends State<ProductForm> {
     }
   }
 
+  void _editProduct(int postId) async {
+    ApiResponse response = await editProduct(postId, _textControllerBody.text);
+    if (response.error == null) {
+      Navigator.of(context).pop();
+    } 
+    else if (response.error == unauthorized) {
+      logout().then((value) => {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => Login()),
+                (route) => false)
+          });
+    } 
+    else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${response.error}')));
+      setState(() {
+        _loading = !_loading;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    if (widget.post != null) {
+      _textControllerBody.text = widget.post!.body ?? '';
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add new product'),
+        title: Text('${widget.title}'),
       ),
       body: _loading
           ? Center(
@@ -70,28 +105,31 @@ class _ProductFormState extends State<ProductForm> {
             )
           : ListView(
               children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 200,
-                  decoration: BoxDecoration(
-                      image: _imageFile == null
-                          ? null
-                          : DecorationImage(
-                              image: FileImage(_imageFile! ?? io.File('')),
-                              fit: BoxFit.cover)),
-                  child: Center(
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.image,
-                        size: 50,
-                        color: Colors.black38,
+                widget.post != null
+                    ? SizedBox()
+                    : Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 200,
+                        decoration: BoxDecoration(
+                            image: _imageFile == null
+                                ? null
+                                : DecorationImage(
+                                    image:
+                                        FileImage(_imageFile! ?? io.File('')),
+                                    fit: BoxFit.cover)),
+                        child: Center(
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.image,
+                              size: 50,
+                              color: Colors.black38,
+                            ),
+                            onPressed: () {
+                              getImage();
+                            },
+                          ),
+                        ),
                       ),
-                      onPressed: () {
-                        getImage();
-                      },
-                    ),
-                  ),
-                ),
                 Form(
                   key: _formKey,
                   child: Padding(
@@ -104,7 +142,7 @@ class _ProductFormState extends State<ProductForm> {
                           ? 'Product description is required'
                           : null,
                       decoration: InputDecoration(
-                          hintText: 'Product description..',
+                          hintText: 'Product price, decription and shop location..',
                           border: OutlineInputBorder(
                               borderSide:
                                   BorderSide(width: 1, color: Colors.black38))),
@@ -118,7 +156,11 @@ class _ProductFormState extends State<ProductForm> {
                       setState(() {
                         _loading = !_loading;
                       });
-                      _createProduct();
+                      if (widget.post == null) {
+                        _createProduct();
+                      } else {
+                        _editProduct(widget.post!.id ?? 0);
+                      }
                     }
                   }),
                 )

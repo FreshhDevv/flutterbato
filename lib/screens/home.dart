@@ -37,7 +37,9 @@ class _HomeState extends State<Home> {
       body: currentIndex == 0 ? ProductScreen() : Profile(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProductForm()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProductForm(
+            title: 'Add new Product',
+          )));
 
         },
         child: Icon(Icons.add),
