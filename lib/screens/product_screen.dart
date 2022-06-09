@@ -43,6 +43,24 @@ class _ProductScreenState extends State<ProductScreen> {
     }
   }
 
+  // post like dislike
+  void _handlePostLikeDislike(int postId) async {
+    ApiResponse response = await likeUnlikePost(postId);
+
+    if (response.error == null) {
+      retrieveProducts();
+    } else if (response.error == unauthorized) {
+      logout().then((value) => {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => Login()),
+                (route) => false)
+          });
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${response.error}')));
+    }
+  }
+
   @override
   void initState() {
     retrieveProducts();
@@ -141,36 +159,32 @@ class _ProductScreenState extends State<ProductScreen> {
                                         fit: BoxFit.cover)),
                               )
                             : SizedBox(height: post.image != null ? 0 : 10),
-                            Row(
-                              children: [
-                               kLikeAndComment(
-                                 post.likesCount ?? 0,
-                                 post.selfLiked ==true? Icons.favorite : Icons.favorite_outline,
-                                 post.selfLiked == true? Colors.red : Colors.black38,
-                                 () {
-
-                                 }
-                               ),
-                                Container(
-                                  height: 25,
-                                  width: 0.5,
-                                  color: Colors.black38,
-                                ),
-                                kLikeAndComment(
-                                 post.commentsCount ?? 0,
-                                 Icons.sms_outlined,
-                                 Colors.black54,
-                                 () {
-                                   
-                                 }
-                               ),
-                              ],
-                            ),
+                        Row(
+                          children: [
+                            kLikeAndComment(
+                                post.likesCount ?? 0,
+                                post.selfLiked == true
+                                    ? Icons.favorite
+                                    : Icons.favorite_outline,
+                                post.selfLiked == true
+                                    ? Colors.red
+                                    : Colors.black38, () {
+                              _handlePostLikeDislike(post.id ?? 0);
+                            }),
                             Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 0.5,
-                              color: Colors.black26,
+                              height: 25,
+                              width: 0.5,
+                              color: Colors.black38,
                             ),
+                            kLikeAndComment(post.commentsCount ?? 0,
+                                Icons.sms_outlined, Colors.black54, () {}),
+                          ],
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 0.5,
+                          color: Colors.black26,
+                        ),
                       ],
                     ),
                   );
