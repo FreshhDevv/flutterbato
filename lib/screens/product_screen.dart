@@ -1,6 +1,7 @@
 import 'package:batoflutter/constant.dart';
 import 'package:batoflutter/models/api_response.dart';
 import 'package:batoflutter/models/product.dart';
+import 'package:batoflutter/screens/comment_screen.dart';
 import 'package:batoflutter/screens/login.dart';
 import 'package:batoflutter/screens/product_form.dart';
 import 'package:batoflutter/services/product_service.dart';
@@ -164,7 +165,8 @@ class _ProductScreenState extends State<ProductScreen> {
                                       } else {
                                         _handleDeletePost(post.id ?? 0);
                                       }
-                                    })
+                                    }
+                                    )
                                 : SizedBox()
                           ],
                         ),
@@ -201,7 +203,15 @@ class _ProductScreenState extends State<ProductScreen> {
                               color: Colors.black38,
                             ),
                             kLikeAndComment(post.commentsCount ?? 0,
-                                Icons.sms_outlined, Colors.black54, () {}),
+                                Icons.sms_outlined, Colors.black54, 
+                                () {
+                                  Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CommentScreen(
+                                                      postId: post.id,
+                                                    )));
+                                }),
                           ],
                         ),
                         Container(

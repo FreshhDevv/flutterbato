@@ -96,6 +96,8 @@ Future<ApiResponse> getUserDetail() async {
   return apiResponse;
 }
 
+
+
 // Get token
 Future<String> getToken() async {
   SharedPreferences pref = await SharedPreferences.getInstance();
